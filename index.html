@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملاذ القراءة الرقمي المتقدم</title>
+    <meta name="description" content="منصة ملاذ القراءة الرقمي - مكتبة تفاعلية تتيح لك قراءة، نشر، وإدارة الكتب الإلكترونية مع تخصيص شامل للأجواء والسمات.">
+    <meta name="keywords" content="مكتبة رقمية, قراءة, نشر كتب, PDF Host, كتب إلكترونية, روايات, علوم, تطبيقات ويب, كودبن">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&family=Tajawal:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0b10;
+            --surface-color: #15151c;
+            --text-color: #e1e1e6;
+            --accent-color: #4a90e2;
+            --danger-color: #ff5252;
+            --font-title: 'Amiri', serif;
+            --font-heading: 'Cairo', sans-serif;
+            --font-body: 'Tajawal', sans-serif;
+        }
+
+        /* 12 Themes */
+        body.theme-1 { --bg-color: #0b0b10; --surface-color: #15151c; --text-color: #e1e1e6; --accent-color: #4a90e2; }
+        body.theme-2 { --bg-color: #0d1b2a; --surface-color: #1b263b; --text-color: #e0e1dd; --accent-color: #778da9; }
+        body.theme-3 { --bg-color: #1e1e24; --surface-color: #2b2b36; --text-color: #d8d8d8; --accent-color: #ffb703; }
+        body.theme-4 { --bg-color: #2b0938; --surface-color: #3f1057; --text-color: #f3c6ff; --accent-color: #bf5af2; }
+        body.theme-5 { --bg-color: #0a1128; --surface-color: #001f54; --text-color: #cae9ff; --accent-color: #0353a4; }
+        body.theme-6 { --bg-color: #1c2541; --surface-color: #3a506b; --text-color: #bcccdc; --accent-color: #5bc0be; }
+        body.theme-7 { --bg-color: #222222; --surface-color: #333333; --text-color: #eeeeee; --accent-color: #00adb5; }
+        body.theme-8 { --bg-color: #283618; --surface-color: #38b000; --text-color: #fefae0; --accent-color: #606c38; }
+        body.theme-9 { --bg-color: #3c096c; --surface-color: #5a189a; --text-color: #e0aaff; --accent-color: #7b2cbf; }
+        body.theme-10 { --bg-color: #12181c; --surface-color: #1f2a32; --text-color: #d1d8e0; --accent-color: #45aaf2; }
+        body.theme-11 { --bg-color: #3b1f2b; --surface-color: #522d3f; --text-color: #eddcd2; --accent-color: #c44536; }
+        body.theme-12 { --bg-color: #111111; --surface-color: #222222; --text-color: #cccccc; --accent-color: #e6e6e6; }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(21, 21, 28, 0.9);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand-title {
+            font-family: var(--font-title);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .settings-container { position: relative; }
+
+        .gear-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 0.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: transform 0.5s;
+        }
+
+        .gear-btn:hover { transform: rotate(180deg); }
+
+        .gear-btn svg { width: 28px; height: 28px; fill: currentColor; }
+
+        /* Rectangular Buttons */
+        .auth-controls { display: flex; gap: 0.5rem; align-items: center; }
+
+        .btn-rect {
+            background: none;
+            border: 2px solid var(--text-color);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 4px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .btn-rect:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 10px var(--text-color);
+        }
+
+        .btn-rect-accent {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: #ffffff;
+        }
+
+        .btn-rect-accent:hover {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: #ffffff;
+            filter: brightness(1.2);
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        view-section {
+            display: none;
+            flex: 1;
+            padding: 1.5rem;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        view-section.active { display: flex; }
+
+        #landing-view {
+            justify-content: center;
+            text-align: center;
+            gap: 1.5rem;
+        }
+
+        .welcome-title {
+            font-family: var(--font-heading);
+            font-size: 3rem;
+            color: var(--accent-color);
+        }
+
+        .dashboard-header {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .categories-bar {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            width: 100%;
+            padding-bottom: 1rem;
+            scrollbar-width: thin;
+            margin-bottom: 1.5rem;
+        }
+
+        .cat-chip {
+            background-color: var(--surface-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            white-space: nowrap;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .cat-chip.active {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background-color: rgba(74, 144, 226, 0.1);
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .book-card {
+            background-color: var(--surface-color);
+            padding: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .book-card h3 {
+            font-family: var(--font-heading);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+        }
+
+        .book-meta {
+            font-size: 0.8rem;
+            opacity: 0.85;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .book-actions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 10, 15, 0.95);
+            padding: 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 80%;
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(0,0,0,0.9);
+            border: 1px solid var(--accent-color);
+        }
+
+        .hidden { display: none !important; }
+
+        /* Dedicated Reader View with Live PDF embed iframe */
+        #reader-view {
+            padding: 0;
+            background-color: var(--bg-color);
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 1000;
+            display: none;
+        }
+        #reader-view.active { display: flex; }
+
+        .reader-header {
+            width: 100%;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--surface-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            z-index: 10;
+        }
+
+        .pdf-container {
+            flex: 1;
+            width: 100%;
+            background-color: #ffffff; /* White canvas for PDF */
+        }
+
+        iframe { width: 100%; height: 100%; border: none; }
+
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+            padding: 1rem;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background-color: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-content h3 { font-family: var(--font-heading); font-size: 1.4rem; color: var(--accent-color); }
+
+        .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+
+        .form-group label { font-size: 0.85rem; opacity: 0.9; font-weight: 600; }
+
+        .modal-content input, .modal-content select, .modal-content textarea {
+            padding: 0.6rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.2);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .modal-content textarea { resize: vertical; min-height: 80px; }
+
+        .dropdown-menu {
+            position: absolute;
+            left: 0;
+            top: 110%;
+            background-color: var(--surface-color);
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            padding: 0.4rem 0;
+            display: none;
+            flex-direction: column;
+            min-width: 180px;
+            z-index: 150;
+            border: 1px solid rgba(255,255,255,0.1);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .dropdown-menu.show { display: flex; }
+
+        .menu-item {
+            padding: 0.6rem 1rem;
+            cursor: pointer;
+            text-align: right;
+            font-family: var(--font-body);
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .menu-item:hover { background-color: rgba(255,255,255,0.1); }
+
+        .external-link { color: var(--accent-color); text-decoration: underline; font-size: 0.85rem; }
+    </style>
+</head>
+<body class="theme-1">
+
+    <canvas id="space-canvas"></canvas>
+
+    <div class="content-wrapper" id="main-content">
+        <header>
+            <h1 class="brand-title">ملاذ القراءة</h1>
+            
+            <div class="header-right">
+                <div class="auth-controls" id="auth-state">
+                    <button class="btn-rect" onclick="openLoginModal('kids')">دخول الأطفال</button>
+                    <button class="btn-rect btn-rect-accent" onclick="openLoginModal('adults')">دخول الكبار</button>
+                </div>
+                
+                <div class="auth-controls hidden" id="user-state">
+                    <span id="user-display-name" style="font-weight:700; font-size: 0.9rem;"></span>
+                    <button class="btn-rect" onclick="logout()">تسجيل خروج</button>
+                </div>
+
+                <div class="settings-container">
+                    <button class="gear-btn" id="gear-btn" aria-label="الإعدادات">
+                        <svg viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.91,5.07L14.54,2.42C14.5,2.18 14.29,2 14,2H10C9.71,2 9.5,2.18 9.46,2.42L9.09,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,13L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.95C7.96,18.34 8.5,18.68 9.09,18.93L9.46,21.58C9.5,21.82 9.71,22 10,22H14C14.29,22 14.5,21.82 14.54,21.58L14.91,18.93C15.5,18.68 16.04,18.34 16.56,17.95L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg>
+                    </button>
+                    <div class="dropdown-menu" id="settings-menu">
+                        <div style="padding: 0.4rem 0.8rem; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.85rem;">اختر السمة (1-12)</div>
+                        <div class="menu-item" onclick="setTheme(1)">السمة 1 (كوني مظلم)</div>
+                        <div class="menu-item" onclick="setTheme(2)">السمة 2 (أزرق عميق)</div>
+                        <div class="menu-item" onclick="setTheme(3)">السمة 3 (دافئ)</div>
+                        <div class="menu-item" onclick="setTheme(4)">السمة 4 (أرجواني)</div>
+                        <div class="menu-item" onclick="setTheme(5)">السمة 5 (محيطي)</div>
+                        <div class="menu-item" onclick="setTheme(6)">السمة 6 (فولاذي)</div>
+                        <div class="menu-item" onclick="setTheme(7)">السمة 7 (رمادي كلاسيكي)</div>
+                        <div class="menu-item" onclick="setTheme(8)">السمة 8 (طبيعي)</div>
+                        <div class="menu-item" onclick="setTheme(9)">السمة 9 (ملكي)</div>
+                        <div class="menu-item" onclick="setTheme(10)">السمة 10 (ليلي هادئ)</div>
+                        <div class="menu-item" onclick="setTheme(11)">السمة 11 (خريفي)</div>
+                        <div class="menu-item" onclick="setTheme(12)">السمة 12 (بسيط)</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <view-section id="landing-view" class="active">
+            <h2 class="welcome-title">أهلاً بك في مساحتك الهادئة</h2>
+            <p style="font-size: 1.1rem; opacity: 0.9; margin-bottom: 1.5rem;">اكتشف، اقرأ، وشارك المعرفة في بيئة مخصصة.</p>
+            <div>
+                <button class="btn-rect btn-rect-accent" style="font-size: 1.1rem; padding: 0.8rem 2rem; border-radius: 30px;" onclick="navigateTo('dashboard-view')">المكتبة الرئيسية</button>
+            </div>
+        </view-section>
+
+        <view-section id="dashboard-view">
+            <div class="dashboard-header">
+                <h3>المكتبة العامة</h3>
+                <button class="btn-rect btn-rect-accent hidden" id="publish-book-btn" onclick="openAddBookModal()">+ نشر كتاب</button>
+            </div>
+            
+            <div class="categories-bar" id="categories-container"></div>
+
+            <div class="books-grid" id="books-grid"></div>
+        </view-section>
+    </div>
+
+    <!-- Dedicated Reader View with Live PDF embed iframe -->
+    <view-section id="reader-view">
+        <div class="reader-header">
+            <button class="btn-rect" onclick="closeReader()">← العودة للمكتبة</button>
+            <h2 id="reader-title" style="font-family:var(--font-heading); font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%;">عنوان الكتاب</h2>
+            <button class="btn-rect btn-rect-accent" onclick="toggleFullscreen()">ملء الشاشة</button>
+        </div>
+        <div class="pdf-container">
+            <iframe id="pdf-frame" src=""></iframe>
+        </div>
+    </view-section>
+
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <h3 id="login-modal-title">تسجيل الدخول</h3>
+            <p id="login-description" style="font-size: 0.9rem; opacity: 0.8;"></p>
+            <div class="form-group" style="margin-top: 0.5rem;">
+                <label>اسم المستخدم</label>
+                <input type="text" id="username-input" placeholder="أدخل اسمك...">
+            </div>
+            <div style="display: flex; gap: 0.8rem; justify-content: flex-end; margin-top: 1rem;">
+                <button class="btn-rect" onclick="closeModal('login-modal')">إلغاء</button>
+                <button class="btn-rect btn-rect-accent" onclick="executeLogin()">دخول</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="add-book-modal">
+        <div class="modal-content">
+            <h3>بيانات الكتاب الجديد</h3>
+            
+            <div class="form-group">
+                <label>عنوان الكتاب</label>
+                <input type="text" id="book-title" placeholder="أدخل العنوان...">
+            </div>
+
+            <div class="form-group">
+                <label>الفئة / التصنيف</label>
+                <select id="book-category"></select>
+            </div>
+
+            <div class="form-group">
+                <label>رابط ملف الـ PDF</label>
+                <input type="url" id="book-pdf" placeholder="https://example.com/book.pdf">
+                <span style="font-size: 0.75rem;">للحصول على رابط: <a href="https://pdfhost.io" target="_blank" class="external-link">PDF Host</a></span>
+            </div>
+
+            <div class="form-group">
+                <label>رابط صورة الغلاف</label>
+                <input type="url" id="book-cover" placeholder="https://example.com/cover.jpg">
+            </div>
+
+            <div class="form-group">
+                <label>المؤلف</label>
+                <input type="text" id="book-author" placeholder="اسم المؤلف...">
+            </div>
+
+            <div class="form-group">
+                <label>المدقق</label>
+                <input type="text" id="book-reviewer" placeholder="اسم المدقق...">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <div class="form-group">
+                    <label>رقم الطبعة</label>
+                    <input type="text" id="book-edition" placeholder="مثال: الأولى...">
+                </div>
+                <div class="form-group">
+                    <label>سنة الطبع</label>
+                    <input type="number" id="book-year" placeholder="مثال: 2026...">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 0.8rem; justify-content: flex-end; margin-top: 1rem;">
+                <button class="btn-rect" onclick="closeModal('add-book-modal')">إلغاء</button>
+                <button class="btn-rect btn-rect-accent" onclick="saveBook()">نشر الكتاب</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CATEGORIES = [
+            "الكل", "العلوم", "التاريخ", "الروايات", "الأطفال", 
+            "الفلسفة", "التطوير الذاتي", "الدين", "الفن", "التكنولوجيا", 
+            "الشعر", "الترجمة", "البلاغة", "البيان"
+        ];
+
+        let currentUser = null;
+        let activeCategory = "الكل";
+        let longPressTimer = null;
+        let selectedBookForAction = null;
+
+        function setTheme(themeNumber) {
+            for(let i=1; i<=12; i++) {
+                document.body.classList.remove(`theme-${i}`);
+            }
+            document.body.classList.add(`theme-${themeNumber}`);
+            localStorage.setItem('selected_theme', themeNumber);
+            closeSettingsMenu();
+        }
+
+        function toggleSettingsMenu(e) {
+            if(e) e.stopPropagation();
+            document.getElementById('settings-menu').classList.toggle('show');
+        }
+
+        function closeSettingsMenu() {
+            document.getElementById('settings-menu').classList.remove('show');
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.settings-container')) {
+                closeSettingsMenu();
+            }
+        }
+
+        document.getElementById('gear-btn').addEventListener('click', toggleSettingsMenu);
+
+        function navigateTo(viewId) {
+            document.querySelectorAll('view-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            if(viewId === 'dashboard-view') {
+                renderCategories();
+                renderBooks();
+            }
+        }
+
+        function openLoginModal(type) {
+            window.loginType = type;
+            const titleEl = document.getElementById('login-modal-title');
+            const descEl = document.getElementById('login-description');
+            
+            if (type === 'kids') {
+                titleEl.textContent = "دخول الأطفال";
+                descEl.textContent = "واجهة مخصصة، مبسطة وآمنة لاستكشاف القصص.";
+            } else {
+                titleEl.textContent = "دخول الكبار";
+                descEl.textContent = "الوصول الكامل للمكتبة، أدوات النشر والتحكم.";
+            }
+            document.getElementById('login-modal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function executeLogin() {
+            const username = document.getElementById('username-input').value.trim();
+            if(!username) return;
+            
+            currentUser = {
+                name: username,
+                role: window.loginType
+            };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            updateAuthUI();
+            closeModal('login-modal');
+            document.getElementById('username-input').value = '';
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateAuthUI();
+            navigateTo('landing-view');
+        }
+
+        function updateAuthUI() {
+            const authState = document.getElementById('auth-state');
+            const userState = document.getElementById('user-state');
+            const publishBookBtn = document.getElementById('publish-book-btn');
+
+            if(currentUser) {
+                authState.classList.add('hidden');
+                userState.classList.remove('hidden');
+                document.getElementById('user-display-name').textContent = `${currentUser.name} (${currentUser.role === 'kids' ? 'صغار' : 'كبار'})`;
+                publishBookBtn.classList.remove('hidden');
+            } else {
+                authState.classList.remove('hidden');
+                userState.classList.add('hidden');
+                publishBookBtn.classList.add('hidden');
+            }
+        }
+
+        function getBooks() {
+            const books = localStorage.getItem('global_books');
+            return books ? JSON.parse(books) : [];
+        }
+
+        function saveBooks(books) {
+            localStorage.setItem('global_books', JSON.stringify(books));
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categories-container');
+            container.innerHTML = '';
+            CATEGORIES.forEach(cat => {
+                const chip = document.createElement('div');
+                chip.className = `cat-chip ${activeCategory === cat ? 'active' : ''}`;
+                chip.textContent = cat;
+                chip.onclick = () => {
+                    activeCategory = cat;
+                    renderCategories();
+                    renderBooks();
+                };
+                container.appendChild(chip);
+            });
+        }
+
+        function renderBooks() {
+            const grid = document.getElementById('books-grid');
+            grid.innerHTML = '';
+            const books = getBooks();
+            
+            if(books.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem; opacity: 0.6; font-size: 1.1rem;">المكتبة فارغة حالياً. بانتظار نشر أول كتاب!</div>';
+                return;
+            }
+
+            const filtered = activeCategory === 'الكل' ? books : books.filter(b => b.category === activeCategory);
+
+            if(filtered.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem; opacity: 0.6; font-size: 1.1rem;">لا توجد كتب في هذا التصنيف حالياً.</div>';
+                return;
+            }
+
+            filtered.forEach(book => {
+                const card = document.createElement('div');
+                card.className = 'book-card';
+                card.innerHTML = `
+                    <div>
+                        ${book.cover ? `<img src="${book.cover}" class="book-cover" onerror="this.style.display='none'">` : '<div class="book-cover" style="display:flex; align-items:center; justify-content:center; background:#222; color:#777; font-size:0.9rem;">لا يوجد غلاف</div>'}
+                        <span style="font-size:0.75rem; background:rgba(74, 144, 226, 0.2); color:var(--accent-color); padding:0.2rem 0.6rem; border-radius:10px; font-weight:600; display:inline-block; margin-bottom:0.4rem;">${book.category}</span>
+                        <h3 style="font-size:1.1rem; margin-bottom:0.3rem;">${book.title}</h3>
+                        <div class="book-meta">
+                            <strong>المؤلف:</strong> ${book.author}<br>
+                            <strong>الناشر:</strong> ${book.publisher}<br>
+                            <strong>الطبعة:</strong> ${book.edition} (${book.year})
+                        </div>
+                    </div>
+                    <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:0.6rem;">
+                        <button class="btn-rect btn-rect-accent" style="width:100%; padding:0.4rem; font-size:0.85rem;" onclick="openReader(event, ${JSON.stringify(book).replace(/"/g, '&quot;')})">قراءة الكتاب</button>
+                        <div style="font-size:0.75rem; opacity:0.5; text-align:center; margin-top:0.4rem;">(اضغط مطولاً للتحكم)</div>
+                    </div>
+                    <div class="book-actions hidden" id="actions-${book.id}">
+                        <button class="btn-rect btn-rect-accent" onclick="republishBook(event, ${book.id})">إعادة نشر</button>
+                        <button class="btn-rect" style="color:var(--danger-color); border-color:var(--danger-color);" onclick="deleteBook(event, ${book.id})">حذف</button>
+                    </div>
+                `;
+
+                card.onmousedown = (e) => startLongPress(book, e);
+                card.onmouseup = () => endLongPress();
+                card.onmouseleave = () => endLongPress();
+                
+                card.ontouchstart = (e) => startLongPress(book, e);
+                card.ontouchend = () => endLongPress();
+
+                grid.appendChild(card);
+            });
+        }
+
+        function startLongPress(book, e) {
+            if(!currentUser || currentUser.name !== book.publisher) return;
+            longPressTimer = setTimeout(() => {
+                document.querySelectorAll('.book-actions').forEach(el => el.classList.add('hidden'));
+                document.getElementById(`actions-${book.id}`).classList.remove('hidden');
+                selectedBookForAction = book;
+            }, 600);
+        }
+
+        function endLongPress() {
+            clearTimeout(longPressTimer);
+        }
+
+        function openAddBookModal() {
+            if(!currentUser) return;
+            const select = document.getElementById('book-category');
+            select.innerHTML = '';
+            CATEGORIES.filter(c => c !== 'الكل').forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                select.appendChild(opt);
+            });
+            document.getElementById('add-book-modal').classList.add('active');
+        }
+
+        function saveBook() {
+            const title = document.getElementById('book-title').value.trim();
+            const category = document.getElementById('book-category').value;
+            const pdfUrl = document.getElementById('book-pdf').value.trim();
+            const cover = document.getElementById('book-cover').value.trim();
+            const author = document.getElementById('book-author').value.trim();
+            const reviewer = document.getElementById('book-reviewer').value.trim();
+            const edition = document.getElementById('book-edition').value.trim();
+            const year = document.getElementById('book-year').value.trim();
+
+            if(!title || !author || !edition || !year || !pdfUrl) {
+                alert("يرجى تعبئة الحقول الأساسية (العنوان، المؤلف، الطبعة، السنة، ورابط الـ PDF).");
+                return;
+            }
+
+            const newBook = {
+                id: Date.now(),
+                title,
+                category,
+                pdfUrl,
+                cover,
+                author,
+                reviewer: reviewer || 'غير محدد',
+                edition,
+                year,
+                publisher: currentUser.name
+            };
+
+            const books = getBooks();
+            books.push(newBook);
+            saveBooks(books);
+
+            closeModal('add-book-modal');
+            
+            document.getElementById('book-title').value = '';
+            document.getElementById('book-pdf').value = '';
+            document.getElementById('book-cover').value = '';
+            document.getElementById('book-author').value = '';
+            document.getElementById('book-reviewer').value = '';
+            document.getElementById('book-edition').value = '';
+            document.getElementById('book-year').value = '';
+            
+            renderBooks();
+        }
+
+        function deleteBook(e, id) {
+            e.stopPropagation();
+            let books = getBooks();
+            books = books.filter(b => b.id !== id);
+            saveBooks(books);
+            document.querySelectorAll('.book-actions').forEach(el => el.classList.add('hidden'));
+            renderBooks();
+        }
+
+        function republishBook(e, id) {
+            e.stopPropagation();
+            document.querySelectorAll('.book-actions').forEach(el => el.classList.add('hidden'));
+            openReader(null, selectedBookForAction);
+        }
+
+        function openReader(e, book) {
+            if(e) e.stopPropagation();
+            document.querySelectorAll('.book-actions').forEach(el => el.classList.add('hidden'));
+            
+            document.getElementById('main-content').style.display = 'none';
+            const readerView = document.getElementById('reader-view');
+            readerView.classList.add('active');
+            document.getElementById('reader-title').textContent = book.title;
+            
+            const iframe = document.getElementById('pdf-frame');
+            iframe.src = book.pdfUrl;
+        }
+
+        function closeReader() {
+            document.getElementById('reader-view').classList.remove('active');
+            document.getElementById('main-content').style.display = 'flex';
+            document.getElementById('pdf-frame').src = ''; 
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+        }
+
+        function toggleFullscreen() {
+            const elem = document.getElementById('reader-view');
+            if (!document.fullscreenElement) {
+                if (elem.requestFullscreen) elem.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        // Canvas Space Background
+        const canvas = document.getElementById('space-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function initSpace() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = [];
+            for(let i = 0; i < 150; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 1.5 + 0.5,
+                    opacity: Math.random() * 0.8 + 0.2,
+                    speed: Math.random() * 0.05 + 0.01
+                });
+            }
+        }
+
+        function animateSpace() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                star.opacity += Math.sin(Date.now() * 0.002 * star.speed) * 0.01;
+                if(star.opacity < 0.2) star.opacity = 0.2;
+                if(star.opacity > 1) star.opacity = 1;
+                
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            requestAnimationFrame(animateSpace);
+        }
+
+        window.addEventListener('resize', initSpace);
+
+        window.onload = () => {
+            initSpace();
+            animateSpace();
+            const savedTheme = localStorage.getItem('selected_theme');
+            if(savedTheme) {
+                setTheme(savedTheme);
+            } else {
+                setTheme(1);
+            }
+            const savedUser = localStorage.getItem('currentUser');
+            if(savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateAuthUI();
+            }
+            renderCategories();
+            renderBooks();
+        };
+    </script>
+</body>
+</html>
