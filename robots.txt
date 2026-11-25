@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://almhmdalghralmhjlyn-rgb.github.io/-/sitemap.xml
